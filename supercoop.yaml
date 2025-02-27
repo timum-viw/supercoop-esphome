@@ -1,0 +1,65 @@
+esphome:
+  name: backdoor
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+# api:
+#   password: ""
+
+# ota:
+#   - platform: esphome
+#     password: ""
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_passwd
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Backdoor Fallback Hotspot"
+    password: "7Y1J5CCDslYL"
+
+captive_portal:
+
+mqtt:
+  broker: mosquitto.digbata.de
+  username: tasmota_3
+  password: !secret mqtt_passwd
+
+globals:
+   - id: open_counter
+     type: int
+     restore_value: no
+     initial_value: '0'
+
+switch:
+  - platform: gpio
+    name: "Relay 1"
+    pin: GPIO5
+    id: relay_1
+
+binary_sensor:
+  - platform: gpio
+    pin: 
+      number: GPIO23
+      mode:
+        input: true
+        pullup: true
+    name: "Switch 1"
+    on_press:
+      then:
+        - switch.turn_on: relay_1
+        - lambda: |-
+            id(open_counter)++;
+        - delay: 5s
+        - lambda: |-
+            if(--id(open_counter) == 0) {
+              id(relay_1).turn_off();
+            }
