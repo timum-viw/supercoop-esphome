@@ -61,13 +61,13 @@ sensor:
 switch:
   - platform: gpio
     name: "Relay 1"
-    pin: GPIO5
+    pin: GPIO15
     id: relay_1
 
 binary_sensor:
   - platform: gpio
     pin: 
-      number: GPIO23
+      number: GPIO13
       mode:
         input: true
         pullup: true
