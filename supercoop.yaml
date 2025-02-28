@@ -18,13 +18,13 @@ logger:
 #     password: ""
 
 i2c:
-  sda: GPIO18
-  scl: GPIO19
+  sda: GPIO19
+  scl: GPIO18
   scan: true
 
 i2c_device:
    id: tcr
-   address: 0xC0
+   address: 0x0c
 
 wifi:
   ssid: !secret wifi_ssid
