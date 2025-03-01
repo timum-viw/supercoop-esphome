@@ -13,18 +13,9 @@ logger:
 # api:
 #   password: ""
 
-# ota:
-#   - platform: esphome
-#     password: ""
-
-i2c:
-  sda: GPIO19
-  scl: GPIO18
-  scan: true
-
-i2c_device:
-   id: tcr
-   address: 0x0c
+ota:
+  - platform: esphome
+    password: ""
 
 wifi:
   ssid: !secret wifi_ssid
@@ -47,16 +38,6 @@ globals:
      type: int
      restore_value: no
      initial_value: '0'
-
-sensor:
-  - platform: template
-    name: "TCR"
-    lambda: |-
-      if (auto v = id(tcr).read_byte(0x00)) {
-        return v;
-      }
-      return {};
-    update_interval: 5s
 
 switch:
   - platform: gpio

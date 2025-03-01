@@ -1,0 +1,58 @@
+esphome:
+  name: tcr
+
+esp8266:
+  board: nodemcuv2
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+# api:
+#   password: ""
+
+i2c:
+  sda: GPIO15
+  scl: GPIO13
+  scan: true
+
+i2c_device:
+   id: tcr
+   address: 0x0c
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_passwd
+  fast_connect: true
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Backdoor Fallback Hotspot"
+    password: "7Y1J5CCDslYL"
+
+captive_portal:
+
+mqtt:
+  broker: mosquitto.digbata.de
+  username: tasmota_3
+  password: !secret mqtt_passwd
+
+text_sensor:
+  - platform: template
+    name: "TCR"
+    icon: "mdi:icon-qrcode"
+    lambda: |-
+      static struct __attribute__((packed)) result_t {
+        uint16_t length;
+        char content[254];
+      } result;
+      auto error = id(tcr).read((uint8_t*)&result, 256);
+      if (error == ErrorCode::NO_ERROR && result.length > 0) {
+        return {str_sprintf("%d",result.length)};
+      }
+      return {};
+    update_interval: 1s
+
+switch:
+  platform: shutdown
+  name: "Shutdown"
