@@ -4,6 +4,11 @@ esphome:
 esp8266:
   board: nodemcuv2
 
+external_components:
+  - source:
+      type: local
+      path: components
+
 # Enable logging
 logger:
 
@@ -12,10 +17,6 @@ i2c:
   scl: GPIO05
   scan: true
   frequency: 100kHz
-
-i2c_device:
-   id: tcr
-   address: 0x0c
 
 wifi:
   ssid: !secret wifi_ssid
@@ -35,23 +36,8 @@ mqtt:
   password: !secret mqtt_passwd
 
 text_sensor:
-  - platform: template
+  - platform: tcr
     name: "member qr"
-    icon: "mdi:qrcode"
-    lambda: |-
-      static struct __attribute__((packed)) result_t {
-        uint16_t length;
-        char content[254];
-      } result;
-      auto error = id(tcr).read((uint8_t*)&result, 128);
-      if (error == ErrorCode::NO_ERROR && result.length > 0 && result.length < 255) {
-        result.content[result.length] = '\0';
-        return {str_sprintf("%s", result.content)};
-      } else if (error != ErrorCode::NO_ERROR) {
-        return {str_sprintf("error %d", error)};
-      }
-      return {};
-    update_interval: 500ms
 
 switch:
   platform: shutdown
